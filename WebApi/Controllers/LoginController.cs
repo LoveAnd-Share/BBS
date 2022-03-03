@@ -15,20 +15,35 @@ namespace WebApi.Controllers
     public class LoginController : ControllerBase
     {
         [HttpGet]
-        public int num(string num,string password)
+        public string num(string num,string password)
         {
+            //连接数据库的字符串
             string config = "Data source=.;Initial Catalog=BBS;User ID=sa;Password=123456;Encrypt=True;TrustServerCertificate=True";
-            SqlConnection sqlConnection = new SqlConnection(config);
+            //创建连接数据库的实例
+            using SqlConnection sqlConnection = new SqlConnection(config);
+            //打开数据库
             sqlConnection.Open();
+            //操作数据库
             SqlCommand sqlCommand = new SqlCommand("SELECT * FROM Users",sqlConnection);
+            //
             SqlDataAdapter sda = new SqlDataAdapter(sqlCommand);
             DataSet ds = new DataSet();
             sda.Fill(ds);
             DataTable res = ds.Tables[0];
             DataRow dataRow = res.Rows[0];
-            var value = dataRow["UserNo"].ToString();
-
-            return 1;
+            //关闭数据库连接
+            sqlConnection.Close();
+            sqlConnection.Dispose();
+            var UserNo = dataRow["UserNo"].ToString();
+            var pwd = dataRow["Password"].ToString();
+            if(UserNo == num && pwd == password)
+            {
+                return "登录成功";
+            }
+            else
+            {
+                return "用户名或者密码错误";
+            }
         }
         [HttpPut]
         public int put(string num,string password)
