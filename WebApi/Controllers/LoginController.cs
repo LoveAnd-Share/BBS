@@ -46,8 +46,14 @@ namespace WebApi.Controllers
             }
         }
         [HttpPut]
-        public int put(string num,string password)
+        public int put(int UserNo,string UserName)
         {
+            string config = "Data source=.;Initial Catalog=BBS;User ID=sa;Password=123456;Encrypt=True;TrustServerCertificate=True";
+            SqlConnection sqlConnection = new SqlConnection(config);
+            sqlConnection.Open();
+            string update = $"update Users set UserLevel = '{UserNo}' where  UserName = '{UserName}'";
+            SqlCommand sqlCommand = new SqlCommand(update,sqlConnection);
+            sqlCommand.ExecuteNonQuery();
             return 1;
         }
         [HttpPost]
@@ -63,8 +69,19 @@ namespace WebApi.Controllers
             return "ss";
         }
         [HttpDelete]
-        public int remove()
+        public int remove(int Id)
         {
+            string config = "Data source=.;Initial Catalog=BBS;User ID=sa;Password=123456;Encrypt=True;TrustServerCertificate=True";
+            SqlConnection sqlConnection = new SqlConnection(config);
+            sqlConnection.Open();
+            //sql语句
+            string update = $"delete from Users where  Id = @Id";
+            SqlCommand sqlCommand = new SqlCommand(update, sqlConnection);
+            //传入sql语句的参数
+            SqlParameter sqlParameter = new SqlParameter("@Id", Id);
+            //为sql命令添加参数
+            sqlCommand.Parameters.Add(sqlParameter);
+            sqlCommand.ExecuteNonQuery();
             return 1;
         }
     }
