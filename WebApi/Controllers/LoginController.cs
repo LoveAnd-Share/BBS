@@ -51,9 +51,16 @@ namespace WebApi.Controllers
             return 1;
         }
         [HttpPost]
-        public int post()
+        public string post(int UserNo,string UserName,int UserLevel,int password)
         {
-            return 1;
+            //建立连接的实例
+            SqlConnection sqlConnection = new SqlConnection("Data source=.;Initial Catalog=BBS;User ID=sa;Password=123456;Encrypt=True;TrustServerCertificate=True");
+            //打开数据库
+            sqlConnection.Open();
+            string str = $"insert into Users(UserNo,UserName,UserLevel,Password,IsDelete) values('{UserNo}','{UserName}','{UserLevel}', '{password}', 0)";
+            SqlCommand sqlCommand = new SqlCommand(str,sqlConnection);
+            sqlCommand.ExecuteNonQuery();
+            return "ss";
         }
         [HttpDelete]
         public int remove()
