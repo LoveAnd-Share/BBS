@@ -16,7 +16,7 @@ namespace WebApi.Controllers
     public class LoginController : ControllerBase
     {
         [HttpGet]//查数据
-        public string num(string num,string password)
+        public string get(string num,string password)
         {
             SqlHelper sqlHelper = new SqlHelper();
             DataTable res = sqlHelper.ExecuteTable("select * from Users");
@@ -34,68 +34,67 @@ namespace WebApi.Controllers
             }
         }
         [HttpPut]//改数据
-        public int put(int Id,string userNo,string userName,string password,int? userLevel)
+        public string Insert(int Id,string userNo,string userName,string password,int? userLevel)
         {
             SqlHelper sqlHelper = new SqlHelper();
+            //获取对应id的数据表
             DataTable table = sqlHelper.ExecuteTable(
-                "select * from user where Id = @Id",
+                "select * from users where Id = @Id",
                 new SqlParameter("@Id",Id)
-                );
-            DataRow dataRow = null;
-            if(table.Rows.Count > 0)
+                ); 
+
+            if (table.Rows.Count > 0)
             {
                 //获取第一行的数据
-                dataRow = table.Rows[0];
+                DataRow dataRow = table.Rows[0];
                 Users users = new Users();
                 //将获取到的数据库的数据赋值给模型
                 users.Id = (int)dataRow["Id"];
-                users.UserNo = userNo??(string)dataRow["UserNo"];
-                users.UserName = userName??(string)dataRow["UserName"];
-                users.UserLevel = userLevel??(int)dataRow["UserLevel"];
-                users.Password = password??(string)dataRow["Password"];
+                users.UserNo = userNo ??dataRow["UserNo"].ToString();
+                users.UserName = userName ?? dataRow["UserName"].ToString();
+                users.UserLevel = userLevel ?? (int)dataRow["UserLevel"];
+                users.Password = password ?? dataRow["Password"].ToString();
 
 
 
 
 
                 sqlHelper.ExecuteNonQuery(
-                "upadte users set userno = '1234' where id = 7",
-                new SqlParameter("@userno",userNo),
-                new SqlParameter("username",userName),
-                new SqlParameter("userlevel",userLevel),
-                new SqlParameter("password",password)
-                
+                "update users set userno = @userno,username = @username,userlevel = @userlevel,password = @password where id = @id",
+                new SqlParameter("@userno",users.UserNo),
+                new SqlParameter("@username",users.UserName),
+                new SqlParameter("@userlevel", users.UserLevel),
+                new SqlParameter("@password", users.Password),
+                new SqlParameter("@id",users.Id)
                 );
             }
-            
-            return 1;
+
+            return "1";
         }
         [HttpPost]//增加数据
-        public string post(int UserNo,string UserName,int UserLevel,int password)
+        public string Update(int UserNo,string UserName,int UserLevel,int password,int isdelete)
         {
-            //建立连接的实例
-            SqlConnection sqlConnection = new SqlConnection("Data source=.;Initial Catalog=BBS;User ID=sa;Password=123456;Encrypt=True;TrustServerCertificate=True");
-            //打开数据库
-            sqlConnection.Open();
-            string str = $"insert into Users(UserNo,UserName,UserLevel,Password,IsDelete) values('{UserNo}','{UserName}','{UserLevel}', '{password}', 0)";
-            SqlCommand sqlCommand = new SqlCommand(str,sqlConnection);
-            sqlCommand.ExecuteNonQuery();
-            return "ss";
+            SqlHelper sqlHelper = new SqlHelper();
+            
+            sqlHelper.ExecuteNonQuery(
+                "insert into users (userno,username,userlevel,password,isdelete) values(@userno ,@username ,@userlevel ,@password ,@isdelete)",
+                new SqlParameter("@userno",UserNo),
+                new SqlParameter("@username", UserNo),
+                new SqlParameter("@userlevel", UserNo),
+                new SqlParameter("@password", UserNo),
+                new SqlParameter("@isdelete", isdelete)
+
+                );
+            return "res";
         }
         [HttpDelete]//删数据
-        public int remove(int Id)
+        public int Delete(int Id)
         {
-            string config = "Data source=.;Initial Catalog=BBS;User ID=sa;Password=123456;Encrypt=True;TrustServerCertificate=True";
-            SqlConnection sqlConnection = new SqlConnection(config);
-            sqlConnection.Open();
-            //sql语句
-            string update = $"delete from Users where  Id = @Id";
-            SqlCommand sqlCommand = new SqlCommand(update, sqlConnection);
-            //传入sql语句的参数
-            SqlParameter sqlParameter = new SqlParameter("@Id", Id);
-            //为sql命令添加参数
-            sqlCommand.Parameters.Add(sqlParameter);
-            sqlCommand.ExecuteNonQuery();
+            SqlHelper sqlHelper = new SqlHelper();
+            sqlHelper.ExecuteNonQuery(
+                "delete from users where id = @id",
+                new SqlParameter("@id",Id)
+                );
             return 1;
         }
     }
