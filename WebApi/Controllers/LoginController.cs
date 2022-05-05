@@ -10,28 +10,37 @@ using WebApi.Core;
 using WebApi.Models;
 namespace WebApi.Controllers
 {
-    //[Route("[controller]/[action]")]
-    [Route("[controller]")]
+    [Route("[controller]/[action]")]
+    //[Route("[controller]")]
     [ApiController]
     public class LoginController : ControllerBase
     {
-        [HttpGet("{num}/{password}")]//查数据
-        public string get(string num,string password)
+        [HttpGet]//查数据
+        public string Login(string userNo,string password)
         {
             SqlHelper sqlHelper = new SqlHelper();
-            DataTable res = sqlHelper.ExecuteTable("select * from Users");
-            DataRow dataRow = res.Rows[1];
-            
-            var UserNo = dataRow["UserNo"].ToString();
-            var pwd = dataRow["Password"].ToString();
-            if(UserNo == num && pwd == password)
+            DataTable res = SqlHelper.ExecuteTable("select * from Users");
+            DataRow dataRow = null;
+            for (int i = 0;i < res.Rows.Count;i++)
             {
-                return "登录成功";
+                if(userNo == dataRow["userno"].ToString())
+                {
+                    if(password == dataRow["password"].ToString())
+                    {
+                        return "success";
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                }
+                else
+                {
+                    string a = dataRow["userno"].ToString();
+                    continue;
+                }
             }
-            else
-            {
-                return "用户名或者密码错误";
-            }
+            return "fail";          
         }
         /// <summary>
         /// 修改数据涉及可能需要原有的值保持不变，引入模型数据接收数据库的值
@@ -47,7 +56,7 @@ namespace WebApi.Controllers
         {
             SqlHelper sqlHelper = new SqlHelper();
             //获取对应id的数据表
-            DataTable table = sqlHelper.ExecuteTable(
+            DataTable table = SqlHelper.ExecuteTable(
                 "select * from users where Id = @Id",
                 new SqlParameter("@Id",Id)
                 ); 
@@ -62,7 +71,7 @@ namespace WebApi.Controllers
                 users.UserName = userName ?? dataRow["UserName"].ToString();
                 users.UserLevel = userLevel ?? (int)dataRow["UserLevel"];
                 users.Password = password ?? dataRow["Password"].ToString();
-                sqlHelper.ExecuteNonQuery(
+                SqlHelper.ExecuteNonQuery(
                 "update users set userno = @userno,username = @username,userlevel = @userlevel,password = @password where id = @id",
                 new SqlParameter("@userno",users.UserNo),
                 new SqlParameter("@username",users.UserName),
@@ -73,12 +82,18 @@ namespace WebApi.Controllers
             }
             return "1";
         }
+        [HttpPut]
+        public string Insert1()
+        {
+
+            return "success";
+        }
         [HttpPost]//增加数据
         public string Update(int UserNo,string UserName,int UserLevel,int password,int isdelete)
         {
             SqlHelper sqlHelper = new SqlHelper();
             
-            sqlHelper.ExecuteNonQuery(
+            SqlHelper.ExecuteNonQuery(
                 "insert into users (userno,username,userlevel,password,isdelete) values(@userno ,@username ,@userlevel ,@password ,@isdelete)",
                 new SqlParameter("@userno",UserNo),
                 new SqlParameter("@username", UserName),
@@ -93,7 +108,7 @@ namespace WebApi.Controllers
         public int Delete(int Id)
         {
             SqlHelper sqlHelper = new SqlHelper();
-            sqlHelper.ExecuteNonQuery(
+            SqlHelper.ExecuteNonQuery(
                 "delete from users where id = @id",
                 new SqlParameter("@id",Id)
                 );
