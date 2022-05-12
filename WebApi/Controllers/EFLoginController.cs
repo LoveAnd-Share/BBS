@@ -28,9 +28,16 @@ namespace WebApi.Controllers
                 var TeacherList = DbStudents.Teachers.ToList();
                 foreach(Teacher item in TeacherList)
                 {
-                    if(userNo == item.Userno || password == item.Password)
+                    if(item.Userno == userNo)
                     {
-                        return "success";
+                        if(item.Password == password)
+                        {
+                            return "success";
+                        }
+                    }
+                    else
+                    {
+                        continue;
                     }
                 }
             }           
