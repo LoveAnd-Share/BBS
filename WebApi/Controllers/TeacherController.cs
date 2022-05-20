@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -44,22 +45,23 @@ namespace WebApi.Controllers
         }
         
         [HttpGet]
-        public List<Students> Retrieve()
+        public List<Students> PageSelect(int pageIndex,int pageSize)
         {
             SqlHelper sqlHelper = new SqlHelper();
-            DataTable res = SqlHelper.ExecuteTable("select * from Student");
+            DataTable res = SqlHelper.ExecuteTable("select * from Student order by id offset @start rows fetch next @pageSize rows only"
+                ,new SqlParameter("@start",(pageIndex-1)*pageSize+1)
+                ,new SqlParameter("@pageSize",pageSize)
+                );
             DataRow dataRow = null;
-            List<Students> students = new List<Students>();
-            Students student = new Students();
+            List<Students> students = new List<Students>();           
             for (int i = 0; i < res.Rows.Count; i++)
             {
-                dataRow = res.Rows[i];                          
-                
+                dataRow = res.Rows[i];
+                Students student = new Students();
                 student.Id = (int)dataRow["id"];
                 student.Name = dataRow["name"].ToString();
                 student.Tename = dataRow["teName"].ToString();
                 student.Age = (int)dataRow["age"];
-
                 students.Add(student);
             }
 
