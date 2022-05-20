@@ -9,7 +9,7 @@ using WebApi.Models;
 
 namespace WebApi.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("[controller]/[action]")]
     [ApiController]
     [EnableCors("any")]
     public class EFLoginController : ControllerBase

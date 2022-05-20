@@ -7,10 +7,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using WebApi.Models;
 using WebApi.Core;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Data.SqlClient;
 
 namespace WebApi.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("[controller]/[action]")]
     [ApiController]
     [EnableCors("any")]
     public class EFStudentController : ControllerBase
@@ -91,6 +93,27 @@ namespace WebApi.Controllers
                 }
             }
         }
-
+        /// <summary>
+        /// ef分页查询
+        /// </summary>
+        /// <param name="pageIndex">页标</param>
+        /// <param name="pageSize">页大小</param>
+        /// <returns></returns>
+        [HttpGet]
+        public List<Student> PageStudent(int pageIndex,int pageSize)
+        {
+            using (StudentsContext db = new StudentsContext())
+            {
+                var res = db.Students.FromSqlRaw("select * from dbo.Student order by id offset @start rows fetch next @end rows only"
+                    , new SqlParameter("@start",(pageIndex-1)*pageSize)
+                    ,new SqlParameter("@end",pageSize));
+                List<Student> stuList = new List<Student>();
+                foreach(var item in res)
+                {
+                    stuList.Add(item);
+                }
+                return stuList;
+            }
+        }
     }
 }

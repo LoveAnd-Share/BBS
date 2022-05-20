@@ -43,7 +43,12 @@ namespace WebApi.Controllers
             }
             return "fail";
         }
-        
+        /// <summary>
+        /// 原生sql分页查询
+        /// </summary>
+        /// <param name="pageIndex">页标</param>
+        /// <param name="pageSize">页大小</param>
+        /// <returns></returns>
         [HttpGet]
         public List<Students> PageSelect(int pageIndex,int pageSize)
         {
