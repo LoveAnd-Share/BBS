@@ -11,7 +11,6 @@ using WebApi.Models;
 namespace WebApi.Controllers
 {
     [Route("[controller]/[action]")]
-    //[Route("[controller]")]
     [ApiController]
     public class LoginController : ControllerBase
     {
