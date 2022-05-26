@@ -25,25 +25,35 @@ namespace WebApi.Controllers
         /// <param name="teName">教师姓名</param>
         /// <param name="age">学生年龄</param>
         [HttpPost]
-        public void AddStu(int id, string name, string teName, int age)
+        public string AddStu(int id, string name, string teName, int age)
         {
             using (StudentsContext DbStudents = new StudentsContext())
             {
                 Student student = new Student();
                 var stuList = DbStudents.Students.ToList();
-                foreach (Student stu in stuList)
+                try
                 {
-                    if (stu.Id == id)
+                    foreach (Student stu in stuList)
                     {
-                        throw new Exception("学号已存在");
+                        if (stu.Id == id)
+                        {
+                            throw new Exception("学号已存在");
+                        }
                     }
                 }
+                catch(Exception e)
+                {
+                    return e.Message;
+                }  
+                
                 student.Id = id;
                 student.Name = name;
                 student.TeName = teName;
                 student.Age = age;
                 DbStudents.Students.Add(student);
                 DbStudents.SaveChanges();
+                return "success";
+
             }
         }
         /// <summary>
